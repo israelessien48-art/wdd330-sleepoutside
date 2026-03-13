@@ -22,15 +22,19 @@ function stripHtml(htmlString) {
 
 function cartItemTemplate(item) {
   const description = stripHtml(item.DescriptionHtmlSimple);
+  const detailsPath =
+    window.location.pathname.includes("/cart/")
+      ? `../product_pages/?product=${item.Id}`
+      : `./product_pages/?product=${item.Id}`;
 
   return `<li class="cart-card divider">
     <button class="cart-card__remove" type="button" data-id="${item.Id}" aria-label="Remove ${item.NameWithoutBrand} from cart">Remove</button>
-    <a href="/product_pages/?product=${item.Id}" class="cart-card__image">
-      <img src="${item.Image}" alt="${item.Name}" onerror="this.onerror=null;this.src='/images/noun_Tent_2517.svg';" />
+    <a href="${detailsPath}" class="cart-card__image">
+      <img src="${item.Image}" alt="${item.Name}" />
     </a>
     <div class="cart-card__details">
       <p class="cart-card__brand">${item.Brand.Name}</p>
-      <a href="/product_pages/?product=${item.Id}" class="cart-card__name-link">
+      <a href="${detailsPath}" class="cart-card__name-link">
         <h3 class="card__name">${item.NameWithoutBrand}</h3>
       </a>
       <p class="cart-card__description">${description}</p>
