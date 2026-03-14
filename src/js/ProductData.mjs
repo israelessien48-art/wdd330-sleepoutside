@@ -9,13 +9,11 @@ function convertToJson(res) {
 export default class ProductData {
   constructor(category) {
     this.category = category;
-    // Calculate path depth: check if we're in a nested directory by counting path segments
-    // /product_pages/ has segments ["", "product_pages", ""], 2 non-empty = nested
-    const allSegments = window.location.pathname.split('/');
-    const nonEmptySegments = allSegments.filter(s => s);
-    // If there are path segments beyond root, we're nested
-    const isNestedPage = nonEmptySegments.length > 0 && !window.location.pathname.endsWith('.html');
-    this.path = isNestedPage ? `../json/${this.category}.json` : `./json/${this.category}.json`;
+    // Determine correct path based on current document location
+    const pathParts = document.currentScript?.src.split('/') || window.location.pathname.split('/');
+    const isSrcFolder = pathParts.some(part => part === 'src');
+    const jsonPath = isSrcFolder ? `../json/${this.category}.json` : `./json/${this.category}.json`;
+    this.path = jsonPath;
   }
   getData() {
     return fetch(this.path)

@@ -8,11 +8,10 @@ function convertToJson(response) {
 export default class Alert {
   constructor(path) {
     if (!path) {
-      // Calculate path depth: check if we're in a nested directory
-      const allSegments = window.location.pathname.split('/');
-      const nonEmptySegments = allSegments.filter(s => s);
-      const isNestedPage = nonEmptySegments.length > 0 && !window.location.pathname.endsWith('.html');
-      path = isNestedPage ? `../json/alerts.json` : `./json/alerts.json`;
+      // Determine correct path based on current document location
+      const pathParts = document.currentScript?.src.split('/') || window.location.pathname.split('/');
+      const isSrcFolder = pathParts.some(part => part === 'src');
+      path = isSrcFolder ? `../json/alerts.json` : `./json/alerts.json`;
     }
     this.path = path;
   }
