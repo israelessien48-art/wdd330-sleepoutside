@@ -9,11 +9,14 @@ function convertToJson(res) {
 export default class ProductData {
   constructor(category) {
     this.category = category;
-    // Determine correct path based on current document location
-    const pathParts = document.currentScript?.src.split('/') || window.location.pathname.split('/');
-    const isSrcFolder = pathParts.some(part => part === 'src');
-    const jsonPath = isSrcFolder ? `../json/${this.category}.json` : `./json/${this.category}.json`;
-    this.path = jsonPath;
+    // Calculate depth from pathname: how many slashes indicate nesting
+    // /index.html = root (0 levels deep)
+    // /cart/index.html = 1 level deep
+    // /product_pages/index.html = 1 level deep (not 2, trailing / doesn't count)
+    const parts = window.location.pathname.split('/').filter(p => p && p !== 'index.html' && !p.includes('.html'));
+    const depth = parts.length;
+    const prefix = depth > 0 ? Array(depth + 1).join('../') : './';
+    this.path = `${prefix}json/${category}.json`;
   }
   getData() {
     return fetch(this.path)

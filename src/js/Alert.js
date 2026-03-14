@@ -8,10 +8,11 @@ function convertToJson(response) {
 export default class Alert {
   constructor(path) {
     if (!path) {
-      // Determine correct path based on current document location
-      const pathParts = document.currentScript?.src.split('/') || window.location.pathname.split('/');
-      const isSrcFolder = pathParts.some(part => part === 'src');
-      path = isSrcFolder ? `../json/alerts.json` : `./json/alerts.json`;
+      // Calculate depth from pathname: how many slashes indicate nesting
+      const parts = window.location.pathname.split('/').filter(p => p && p !== 'index.html' && !p.includes('.html'));
+      const depth = parts.length;
+      const prefix = depth > 0 ? Array(depth + 1).join('../') : './';
+      path = `${prefix}json/alerts.json`;
     }
     this.path = path;
   }
