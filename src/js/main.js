@@ -1,7 +1,9 @@
 import ProductData from "./ProductData.mjs";
 import ProductList from "./ProductList.mjs";
 import Alert from "./Alert.js";
-import { updateCartCount } from "./utils.mjs";
+import { loadHeaderFooter, updateCartCount } from "./utils.mjs";
+
+await loadHeaderFooter();
 
 const dataSource = new ProductData("tents");
 const listElement = document.querySelector(".product-list");

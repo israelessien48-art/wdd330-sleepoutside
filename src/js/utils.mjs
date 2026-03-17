@@ -100,6 +100,89 @@ export function getParam(param) {
   return urlParams.get(param);
 }
 
+function getSiteBasePath() {
+  const modulePath = new URL(import.meta.url).pathname;
+  const markers = ["/src/js/utils.mjs", "/js/utils.mjs", "/assets/"];
+
+  for (const marker of markers) {
+    const markerIndex = modulePath.indexOf(marker);
+    if (markerIndex >= 0) {
+      return modulePath.slice(0, markerIndex);
+    }
+  }
+
+  return "";
+}
+
+function resolveTemplatePath(path) {
+  if (!path.startsWith("/")) {
+    return path;
+  }
+
+  const siteBasePath = getSiteBasePath();
+  return `${siteBasePath}${path}`;
+}
+
+function normalizeAssetPaths(container) {
+  const siteBasePath = getSiteBasePath();
+
+  if (!siteBasePath) {
+    return;
+  }
+
+  container.querySelectorAll("[href^='/'], [src^='/']").forEach((element) => {
+    const attr = element.hasAttribute("href") ? "href" : "src";
+    const value = element.getAttribute(attr);
+
+    if (!value || value.startsWith("//")) {
+      return;
+    }
+
+    element.setAttribute(attr, `${siteBasePath}${value}`);
+  });
+}
+
+export async function loadTemplate(path) {
+  const response = await fetch(resolveTemplatePath(path));
+
+  if (!response.ok) {
+    throw new Error(`Unable to load template: ${path}`);
+  }
+
+  return response.text();
+}
+
+export function renderWithTemplate(template, parentElement, data, callback) {
+  parentElement.innerHTML = template;
+  normalizeAssetPaths(parentElement);
+
+  if (callback) {
+    callback(data);
+  }
+}
+
+export async function loadHeaderFooter() {
+  const headerElement = document.querySelector("#main-header");
+  const footerElement = document.querySelector("#main-footer");
+
+  if (!headerElement && !footerElement) {
+    return;
+  }
+
+  const [headerTemplate, footerTemplate] = await Promise.all([
+    loadTemplate("/partials/header.html"),
+    loadTemplate("/partials/footer.html"),
+  ]);
+
+  if (headerElement) {
+    renderWithTemplate(headerTemplate, headerElement);
+  }
+
+  if (footerElement) {
+    renderWithTemplate(footerTemplate, footerElement);
+  }
+}
+
 export function renderListWithTemplate(
   templateFn,
   parentElement,

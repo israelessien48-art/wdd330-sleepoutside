@@ -3,6 +3,7 @@ import {
   getCartItems,
   groupCartItems,
   imageExists,
+  loadHeaderFooter,
   removeProductFromCart,
   renderListWithTemplate,
   setLocalStorage,
@@ -22,10 +23,9 @@ function stripHtml(htmlString) {
 
 function cartItemTemplate(item) {
   const description = stripHtml(item.DescriptionHtmlSimple);
-  const detailsPath =
-    window.location.pathname.includes("/cart/")
-      ? `../product_pages/?product=${item.Id}`
-      : `./product_pages/?product=${item.Id}`;
+  const detailsPath = window.location.pathname.includes("/cart/")
+    ? `../product_pages/?product=${item.Id}`
+    : `./product_pages/?product=${item.Id}`;
 
   return `<li class="cart-card divider">
     <button class="cart-card__remove" type="button" data-id="${item.Id}" aria-label="Remove ${item.NameWithoutBrand} from cart">Remove</button>
@@ -95,4 +95,5 @@ cartListElement.addEventListener("click", (event) => {
   void renderCartContents();
 });
 
+await loadHeaderFooter();
 void renderCartContents();
