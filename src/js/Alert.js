@@ -12,12 +12,16 @@ export default class Alert {
 
   async getAlerts() {
     // Try multiple path strategies to handle different server layouts
-    const pathStrategies = this.customPath ? [this.customPath] : [
-      `./json/alerts.json`,      // Same directory level
-      `../json/alerts.json`,     // One level up
-      `/json/alerts.json`,       // Absolute from root
-      `../../json/alerts.json`,  // Two levels up
-    ];
+    const pathStrategies = this.customPath
+      ? [this.customPath]
+      : [
+          `./json/alerts.json`, // Same directory level
+          `../json/alerts.json`, // One level up
+          `/json/alerts.json`, // Absolute from root
+          `../../json/alerts.json`, // Two levels up
+          `src/json/alerts.json`, // Live Server from root
+          `src/public/json/alerts.json`, // Live Server public folder
+        ];
 
     for (const path of pathStrategies) {
       try {
@@ -30,7 +34,7 @@ export default class Alert {
         // Continue to next strategy
       }
     }
-    
+
     // If all paths fail, return empty array (no alerts is acceptable)
     return [];
   }
