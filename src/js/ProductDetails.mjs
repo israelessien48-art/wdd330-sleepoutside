@@ -53,25 +53,24 @@ export default class ProductDetails {
   }
 
   addToCartHandler() {
-    // Lógica para LocalStorage
-    const cart = JSON.parse(localStorage.getItem("so-cart") || "[]");
-    const existingItem = cart.find((item) => item.Id === this.product.Id);
-    
-    const finalPrice = Number(this.product.FinalPrice);
+  const cart = JSON.parse(localStorage.getItem("so-cart") || "[]");
+  const existingItem = cart.find((item) => item.Id === this.product.Id);
+  
+  const finalPrice = Number(this.product.FinalPrice || 0);
 
-    if (existingItem) {
-      // Incrementar cantidad si ya existe
-      existingItem.quantity = (existingItem.quantity || 1) + this.selectedQuantity;
-      existingItem.lineTotal = Number(existingItem.lineTotal) + (finalPrice * this.selectedQuantity);
-    } else {
-      // Agregar nuevo item
-      const newItem = {
-        ...this.product,
-        quantity: this.selectedQuantity,
-        lineTotal: finalPrice * this.selectedQuantity,
-      };
-      cart.push(newItem);
-    }
+  if (existingItem) {
+    existingItem.quantity = (Number(existingItem.quantity) || 1) + this.selectedQuantity;
+    // Recalculamos el lineTotal para que sea persistente
+    existingItem.lineTotal = existingItem.quantity * finalPrice;
+  } else {
+    // IMPORTANTE: Guardamos una copia de this.product para tener Name, Image, etc.
+    const newItem = {
+      ...this.product,
+      quantity: this.selectedQuantity,
+      lineTotal: finalPrice * this.selectedQuantity,
+    };
+    cart.push(newItem);
+  }
     
     localStorage.setItem("so-cart", JSON.stringify(cart));
     
